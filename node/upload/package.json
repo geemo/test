@@ -1,0 +1,11 @@
+{
+  "name": "upload",
+  "version": "1.0.0",
+  "description": "file upload test",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "geemo",
+  "license": "MIT"
+}

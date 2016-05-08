@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <form id="form" action="/upload" enctype="multipart/form-data" method="post">
+        <input type="text" name="title">
+        <br>
+        <input type="file" name="upload">
+        <br>
+        <input type="submit" value="Upload">
+    </form>
+    <progress id="progress" max="100" value="0"></progress>
+    <script>
+    !function(){
+        var progress = document.getElementById('progress');
+        var form = document.getElementById('form');
+        form.onsubmit = submit;
+
+        function submit(e){
+            e.preventDefault();
+
+            var xhr = new XMLHttpRequest();
+            xhr.upload.onprogress = updateProgress;
+
+            xhr.open('POST', form.action);
+            xhr.send(getFormData());
+        }
+
+        function getFormData(){
+            var formData = new FormData();
+
+            var ipts = document.getElementsByTagName('input');
+            var ipt = null;
+            for(var i = 0; i < ipts.length; ++i){
+                ipt = ipts[i];
+                if(ipt.type === 'file') formData.append(ipt.name, ipt.files[0]);
+                else formData.append(ipt.name, ipt.value);
+            }
+
+            return formData;
+        }
+
+        function updateProgress(e){
+            if(e.lengthComputable){
+                progress.value = Math.floor(e.loaded * 100 / e.total);
+            }
+        }
+    }()
+    </script>
+</body>
+
+</html>
