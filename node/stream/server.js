@@ -2,13 +2,11 @@
 
 const net = require('net');
 
-let chunks = [];
-let server = net.createServer(conn => {
+let client = net.connect(6379, () => console.log('connected'));
 
-	conn.setEncoding('utf8');
-	conn.on('data', data => {
-		console.log(data);
-	});
-	conn.pipe(conn);
+client.setEncoding('utf8');
+client.on('data', data => {
+	console.log(data);
 });
-server.listen(3000, () => console.log('server start on port 3000'));
+
+process.stdin.pipe(client);
