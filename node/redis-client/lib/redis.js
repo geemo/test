@@ -143,16 +143,4 @@ class Redis extends EventEmitter {
 	}
 }
 
-
-//test
-const redis = new Redis();
-redis.on('connect', () => {
-	console.log('connected!');
-});
-
-redis.exec('auth Wmeiyoumima')
-.exec('lrange list1 0 -1', (err, data) => {
-	if(err) console.log(err);
-	else console.log(data);
-	redis.close();
-});
+module.exports = exports = Redis;
