@@ -26,14 +26,23 @@ try{
     catchError(err);
 }
 
-render(path.join(cwd, entryFile));
+let realPath = path.join(cwd, entryFile);
+merge(path.join(cwd, entryFile));
+// 监听文件修改
+fs.watch(realPath, (event, filename) => {
+    // 如果是内容修改，重新渲染合并
+    if(event === 'change'){
+        console.log('\x1b[33mlisten to the file has been modified, rebuild...\x1b[0m');
+        merge(realPath);    
+    }
+});
 
-function render(file){
+function merge(file){
     fs.readFile(file, 'utf8', (err, data) => {
         if(err) catchError(err);
         
         // 替换模板中<link rel="import" href="path">为对应path的内容
-        let replaceData = data.replace(/<link\s+rel="import"\s+href="(.*)"\s*>/gi, (match, m1) => {
+        let replaceData = data.replace(/<link\s+rel="import"\s+href="(.*)"\s*>/mgi, (match, m1) => {
             let m1Data = '';
             try{
                 // 读取替换文件的内容，若文件路径不存在则抛出异常
