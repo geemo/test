@@ -39,12 +39,3 @@ const server = http.createServer((req, res) => {
 server.listen(port, () => {
 	console.log(`server start on port: ${port}`);
 });
-
-// var name = 'The';
-// var object = {
-// 	name: 'My',
-// 	getName: function(){return this.name;}
-// };
-// var log = console.log.bind(console);
-// log((object.getName)());
-// log((object.getName = object.getName)());
