@@ -1,0 +1,28 @@
+*{
+	margin: 0;
+	padding: 0;
+	color: #000;
+}
+
+.tab .active{
+	border-bottom-color: #0f0;
+	color: #0f0;
+}
+
+.tab a{
+	display: inline-block;
+	padding: 10px 0;
+	margin: 0 45px;
+	text-decoration: none;
+	font: menu;
+	font-size: 15px;
+}
+
+.panel img{
+	display: none;
+	padding: 26px;
+}
+
+.panel .active{
+	display: inline-block;
+}

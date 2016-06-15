@@ -1,0 +1,10 @@
+{
+	".html": "text/html; charset=utf-8",
+	".css": "text/css",
+	".txt": "text/plain",
+	".js": "application/x-javascript",
+	".png": "image/png",
+	".jpg": "image/jpg",
+	".jpeg": "image/jpeg",
+	".gif": "image/gif"
+}
