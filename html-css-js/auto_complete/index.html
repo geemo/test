@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    
+    li {
+        list-style: none;
+    }
+    
+    form {
+        display: inline-block;
+        position: relative;
+    }
+    
+    .search {
+        position: absolute;
+        width: 173px;
+    }
+    </style>
+</head>
+
+<body>
+    <form action="" method="get" onsubmit="">
+        <span style="display: inline-block;">
+			<input type="text" id="ipt" autocomplete="off">
+			<input type="submit" value="search">
+		</span>
+        <div class="search">
+            <ul id="search-box" style="border: 1px solid #000;display: none">
+            </ul>
+        </div>
+    </form>
+    <script src="city.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
