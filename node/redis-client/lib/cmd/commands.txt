@@ -1,0 +1,4 @@
+GET
+SET
+AUTH
+KEYS

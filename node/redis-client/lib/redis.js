@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events').EventEmitter;
 const net = require('net');
+const fs = require('fs');
 
 class RedisProto {
 	constructor(){
@@ -112,9 +113,11 @@ class Redis extends EventEmitter {
 		});
 		this._connect.on('data', data => this._handle(data));
 		this._connect.on('end', () => this.emit('end'));
+
+		this._bindCmds();
 	}
 
-	exec(cmd, fn){
+	query(cmd, fn){
 		if(this._isClosed) throw new Error('connection has been closed');
 
 		fn ? this._fns.push(fn) : this._fns.push(null);
@@ -136,6 +139,30 @@ class Redis extends EventEmitter {
 				fn && fn(null, result.data);
 			}
 		}
+	}
+
+	_bindCmds(){
+		const bind = (cmd) => {
+			return function(){
+				const args = Array.prototype.slice.call(arguments);
+				let cb = args[args.length - 1];
+
+				if(typeof cb === 'function') {
+					args.pop();				
+				}
+
+				args = args.map(arg => Array.isArray(arg) ? arg.join(' ') : arg).join(' ');
+				this.query(`${cmd} ${args}\r\n`, cb);
+			};
+		};
+
+		fs.readFile('./cmd/commands.txt', 'utf8', (err, cmds) => {
+			if(err) return this.emit('error', err);
+
+			cmds.trim().split('\n').forEach(cmd => {
+				this[cmd.toLowerCase()] = this[cmd.toUpperCase()] = bind(cmd);
+			});
+		});
 	}
 
 	close() {

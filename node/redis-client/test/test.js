@@ -6,16 +6,16 @@ redis.on('connect', () => {
     console.log('connected!');
 });
 
-redis.exec('auth Wmeiyoumima')
-    .exec('lrange list1 0 -1', (err, data) => {
+redis.query('auth Wmeiyoumima')
+    .query('lrange list1 0 -1', (err, data) => {
         if (err) console.log(err);
         else console.log(data);
     })
-    .exec('set aa 5', (err, data) => {
+    .query('set aa 5', (err, data) => {
         if (err) console.log(err);
         else console.log(data);
     })
-    .exec('get aa', (err, data) => {
+    .query('get aa', (err, data) => {
         if(err) console.log(err);
         else console.log(data);
         redis.close();
