@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var ws = new WebSocket('ws://localhost');
+        ws.onopen = function() {
+            console.log('handshake success');
+            ws.send('hello geemo!');
+        };
+
+        ws.onmessage = function(e) {
+            console.dir(e);
+        };
+
+        ws.onclose = function(e) {
+            console.dir(e);
+            ws.close();
+        };
+
+        ws.onerror = function(e) {
+            console.dir(e);
+        };
+    </script>
+</body>
+</html>
