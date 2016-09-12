@@ -62,7 +62,9 @@ function handle(socket) {
         if(frame.isFinal) {
             if(frame.opcode === 0) {
                 let frame = frameArr[0], payloadDataArr = [];
-                payloadDataArr = frameArr.filter(fram => fram.payloadData);
+                payloadDataArr = frameArr
+                                    .filter(frame => frame.payloadData)
+                                    .map(frame => frame.payloadData);
                 frame.payloadData = Buffer.concat(payloadDataArr);
                 opHandle(socket, frame);
                 frameArr = [];
