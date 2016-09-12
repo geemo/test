@@ -43,7 +43,10 @@ server.listen(PORT, () => console.log(`server start on port ${PORT}`));
 function eventMount(socket) {
     socket.on('message', msg => {
         console.log(msg);
-        socket.write(encodeWsFrame({payloadData: 'hello 小埋!'}));
+
+        socket.write(encodeWsFrame({isFinal: false, opcode: 1, payloadData: 'bbb'}));
+        socket.write(encodeWsFrame({isFinal: false, opcode: 0, payloadData: 'ccc'}));
+        socket.write(encodeWsFrame({isFinal: true, opcode: 0, payloadData: 'ddd'}));
     });
 
     socket.on('close', () => {
@@ -52,12 +55,48 @@ function eventMount(socket) {
 
 function handle(socket) {
     let frame, frameArr = [];
+
     socket.on('data', rawFrame => {
         frame = decodeWsFrame(rawFrame);
-        if(frame.isFinal && frame.opcode === 1) {
-            socket.emit('message', {type: 'text', data: frame.payloadData.toString('utf8')});
+
+        if(frame.isFinal) {
+            if(frame.opcode === 0) {
+                let frame = frameArr[0], payloadDataArr = [];
+                payloadDataArr = frameArr.filter(fram => fram.payloadData);
+                frame.payloadData = Buffer.concat(payloadDataArr);
+                opHandle(socket, frame);
+                frameArr = [];
+            } else {
+                opHandle(socket, frame);
+            }
+        } else {
+            frameArr.push(frame);
         }
     });
+}
+
+function opHandle(socket, frame) {
+    switch(frame.opcode) {
+        case 1: 
+            socket.emit('message', {type: 'text', data: frame.payloadData.toString('utf8')});
+            break;
+        case 2:
+            socket.emit('message', {type: 'binary', data: frame.payloadData});
+            break;
+        case 8:
+            socket.emit('close');
+            socket.end();
+            break;
+        case 9:
+            socket.emit('ping');
+            console.dir(frame);
+            socket.write(encodeWsFrame({opcode: 10}));
+            break;
+        case 10:
+            socket.emit('pong');
+            console.dir(frame);
+            break;
+    }
 }
 
 function decodeWsFrame(data) {
@@ -72,44 +111,47 @@ function decodeWsFrame(data) {
     };
 
     if(frame.payloadLen === 126) {
-        payloadLen = (data[start++] << 8) + data[start++];
+        frame.payloadLen = (data[start++] << 8) + data[start++];
     } else if(frame.payloadLen === 127) {
         start += 4;
-        payloadLen = (data[start++] << 24)
-                    + (data[start++] << 16)
-                    + (data[start++] << 8)
-                    + (data[start++]);
+        frame.payloadLen = (data[start++] << 24)
+                        + (data[start++] << 16)
+                        + (data[start++] << 8)
+                        + (data[start++]);
     }
 
-    if(frame.masked) {
-        const maskingKey = [
-            data[start++],
-            data[start++],
-            data[start++],
-            data[start++]
-        ];
+    if(frame.payloadLen) {
+        if(frame.masked) {
+            const maskingKey = [
+                data[start++],
+                data[start++],
+                data[start++],
+                data[start++]
+            ];
 
-        frame.maskingKey = maskingKey;
+            frame.maskingKey = maskingKey;
 
-        frame.payloadData = data
-                            .slice(start, start + frame.payloadLen)
-                            .map((byte, idx) => byte ^ maskingKey[idx % 4]);
-    } else {
-        frame.payloadData = data.slice(start, start + frame.payloadLen);
+            frame.payloadData = data
+                                .slice(start, start + frame.payloadLen)
+                                .map((byte, idx) => byte ^ maskingKey[idx % 4]);
+        } else {
+            frame.payloadData = data.slice(start, start + frame.payloadLen);
+        }
     }
 
     return frame;
 }
 
 function encodeWsFrame(data) {
-    const isFinal = data.isFinal || true,
-          opcode = data.opcode || 1,
-          payloadData = new Buffer(data.payloadData),
-          payloadLen = payloadData.length;
+    const isFinal = data.isFinal !== undefined ? data.isFinal : true,
+          opcode = data.opcode !== undefined ? data.opcode : 1,
+          payloadData = data.payloadData ? new Buffer(data.payloadData) : null,
+          payloadLen = payloadData ? payloadData.length : 0;
 
     let frame = [];
 
     if(isFinal) frame.push((1 << 7) + opcode);
+    else frame.push(opcode);
 
     if(payloadLen < 126) frame.push(payloadLen);
     else if(payloadLen < 65536) frame.push(126, payloadLen >> 8, payloadLen & 0xFF);
@@ -119,7 +161,9 @@ function encodeWsFrame(data) {
                     (payloadLen & 0xFF00) >> 8, 
                     payloadLen & 0xFF);
 
-    frame = Buffer.concat([new Buffer(frame), payloadData]);
+    
+    frame = payloadData ? Buffer.concat([new Buffer(frame), payloadData]) : new Buffer(frame);
 
+    console.dir(decodeWsFrame(frame));
     return frame;
 }
