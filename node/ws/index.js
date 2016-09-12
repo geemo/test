@@ -61,6 +61,7 @@ function handle(socket) {
 
         if(frame.isFinal) {
             if(frame.opcode === 0) {
+                frameArr.push(frame);
                 let frame = frameArr[0], payloadDataArr = [];
                 payloadDataArr = frameArr
                                     .filter(frame => frame.payloadData)
