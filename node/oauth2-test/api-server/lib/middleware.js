@@ -2,7 +2,6 @@
 
 exports.extendApiOutput = extendApiOutput;
 exports.apiErrorHandle = apiErrorHandle;
-exports.ensureLogin = ensureLogin;
 
 function extendApiOutput(req, res, next) {
 	res.apiSuccess = data => {
@@ -31,11 +30,4 @@ function apiErrorHandle(err, req, res, next) {
 		return res.apiError(err);
 
 	next(err);
-}
-
-function ensureLogin(req, res, next) {
-	// 检查用户是否已经登录
-	// 为了简化直接默认已经登录
-	req.loginUserId = 'geemo';
-	next();
 }

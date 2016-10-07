@@ -5,10 +5,13 @@ const formatUrl = require('url').format;
 
 exports.addQueryParamsToUrl = addQueryParamsToUrl;
 exports.randomString = randomString;
+exports.defaultNumber = defaultNumber;
 exports.createApiError = createApiError;
 exports.missingParameterError = missingParameterError;
 exports.redirectUriNotMatchError = redirectUriNotMatchError;
 exports.invalidParameterError = invalidParameterError;
+exports.authorizationCodeExpiredError = authorizationCodeExpiredError;
+exports.accessTokenExpiredError = accessTokenExpiredError;
 
 function addQueryParamsToUrl(url, params) {
 	let urlObj = parseUrl(url, true);
@@ -30,6 +33,12 @@ function randomString(size, chars) {
 	return randomStr;
 }
 
+function defaultNumber(n, d) {
+	n = Number(n);
+	d = Number(d);
+	return n > 0 ? n : d;
+}
+
 function createApiError(code, msg) {
 	const err = new Error(msg);
 	err.err_code = code;
@@ -47,4 +56,12 @@ function redirectUriNotMatchError(uri) {
 
 function invalidParameterError(name) {
 	return createApiError('INVALID_PARAMETER', `invalid parameter: ${name}`);
+}
+
+function authorizationCodeExpiredError() {
+	return createApiError('AUTHORIZATION_CODE_EXPIRED', 'authorization code expired');
+}
+
+function accessTokenExpiredError() {
+	return createApiError('ACCESS_TOKEN_EXPIRED', 'access token expired');
 }
