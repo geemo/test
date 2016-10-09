@@ -6,5 +6,6 @@ const api = require('./api');
 exports = module.exports = app => {
 	app.use('/Oauth2', authorize);
 	app.use('/api', api);
-	// app.use('/example', client);
+	// 模拟客户端获取授权码
+	app.use('/client', client);
 };
