@@ -6,7 +6,7 @@
 </head>
 <body>
     <script>
-        var ws = new WebSocket('ws://localhost');
+        var ws = new WebSocket('ws://localhost:3000');
         ws.onopen = function() {
             console.log('handshake success');
             ws.send('hello geemo!');
