@@ -57,20 +57,22 @@ function mountCustomEvent(socket) {
 
     socket.on('message', msg => {
         console.log(msg);
-
+        // 测试代码
         // socket.write(encodeWsFrame({isFinal: false, opcode: 1, payloadData: 'bbb'}));
         // socket.write(encodeWsFrame({isFinal: false, opcode: 0, payloadData: 'ccc'}));
         // socket.write(encodeWsFrame({isFinal: true, opcode: 0, payloadData: 'ddd'}));
 
         // socket.send('asdf');
-        // socket.send({data: 'bbb', isFinal: false});
-        // socket.send({data: 'ccc'});
+        socket.send({data: 'bbb', isFinal: false});
+        socket.send({data: new Buffer('ccc')});
         // socket.send({data: new Buffer('ccc'), type: 'binary'});
         // socket.send(new Buffer('bbbbasdf'));
-        socket.send({data: new Buffer('bsdf')});
-    });
+        // socket.send({data: new Buffer('bsdf')});
+    }).on('ping', () => {
 
-    socket.on('close', () => {
+    }).on('pong', () => {
+
+    }).on('close', () => {
         socket.end();
     });
 }
@@ -119,13 +121,8 @@ function mountSendMethod(socket) {
         // 如果起始帧已经写入，后续帧直到终止帧都是附加帧
         if(startFrameWrited) opcode = 0;
 
-        if(isFinal === false) {
-            startFrameWrited = true;
-            return this.write(encodeWsFrame({isFinal, opcode, payloadData}));
-        } else if(startFrameWrited && isFinal) {
-            startFrameWrited = false;
-            return this.write(encodeWsFrame({isFinal, opcode, payloadData}));
-        }
+        if(isFinal === false) startFrameWrited = true;
+        else if(startFrameWrited && isFinal) startFrameWrited = false;
 
         return this.write(encodeWsFrame({isFinal, opcode, payloadData}));
     }
