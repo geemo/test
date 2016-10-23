@@ -36,10 +36,10 @@ server.listen(PORT, () => console.log(`server start on port ${PORT}`));
 // ws握手阶段
 function handshake(req, socket) {
     // 固定GUID
-    const NONCE = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
-    // 获取客户端返回的key与随机串进行sha1编码后获取base64格式摘要
+    const GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
+    // 获取客户端返回的key与GUID进行sha1编码后获取base64格式摘要
     let key = req.headers['sec-websocket-key'];
-    key = crypto.createHash('sha1').update(key + NONCE).digest('base64');
+    key = crypto.createHash('sha1').update(key + GUID).digest('base64');
 
     // 返回101协议切换响应
     const resMsg = [
