@@ -244,13 +244,16 @@ function encodeWsFrame(data) {
     if(isFinal) frame.push((1 << 7) + opcode);
     else frame.push(opcode);
 
-    if(payloadLen < 126) frame.push(payloadLen);
-    else if(payloadLen < 65536) frame.push(126, payloadLen >> 8, payloadLen & 0xFF);
-    else frame.push(127, 0, 0, 0, 0, 
-                    (payloadLen & 0xFF000000) >> 24, 
-                    (payloadLen & 0xFF0000) >> 16, 
-                    (payloadLen & 0xFF00) >> 8, 
-                    payloadLen & 0xFF);
+    if(payloadLen < 126) {
+        frame.push(payloadLen);
+    } else if(payloadLen < 65536){
+        frame.push(126, payloadLen >> 8, payloadLen & 0xFF);
+    } else {
+        frame.push(127);
+        for(let i = 7; i >= 0; --i) {
+            frame.push((payloadLen & (0xFF << (i * 8))) >> (i * 8));
+        }
+    }
 
     
     frame = payloadData ? Buffer.concat([new Buffer(frame), payloadData]) : new Buffer(frame);
