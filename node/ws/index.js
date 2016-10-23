@@ -35,7 +35,7 @@ server.listen(PORT, () => console.log(`server start on port ${PORT}`));
 
 // ws握手阶段
 function handshake(req, socket) {
-    // 固定随机串
+    // 固定GUID
     const NONCE = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
     // 获取客户端返回的key与随机串进行sha1编码后获取base64格式摘要
     let key = req.headers['sec-websocket-key'];
@@ -204,11 +204,10 @@ function decodeWsFrame(data) {
     if(frame.payloadLen === 126) {
         frame.payloadLen = (data[start++] << 8) + data[start++];
     } else if(frame.payloadLen === 127) {
-        start += 4;
-        frame.payloadLen = (data[start++] << 24)
-                        + (data[start++] << 16)
-                        + (data[start++] << 8)
-                        + (data[start++]);
+        frame.payloadLen = 0;
+        for(let i = 7; i >= 0; --i) {
+            frame.payloadLen += (data[start++] << (i * 8));
+        }
     }
 
     if(frame.payloadLen) {
