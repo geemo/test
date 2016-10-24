@@ -62,9 +62,13 @@ function mountCustomEvent(socket) {
         // socket.write(encodeWsFrame({isFinal: false, opcode: 0, payloadData: 'ccc'}));
         // socket.write(encodeWsFrame({isFinal: true, opcode: 0, payloadData: 'ddd'}));
 
+        let buf = new Buffer('\0\0asdf');
+        buf.writeUInt16BE(1000, 0);
+        socket.send({data: buf, type: 'close'});
+
         // socket.send('asdf');
-        socket.send({data: 'bbb', isFinal: false});
-        socket.send({data: new Buffer('ccc')});
+        // socket.send({data: 'bbb', isFinal: false});
+        // socket.send({data: new Buffer('ccc')});
         // socket.send({data: new Buffer('ccc'), type: 'binary'});
         // socket.send(new Buffer('bbbbasdf'));
         // socket.send({data: new Buffer('bsdf')});
@@ -91,7 +95,7 @@ function mountSendMethod(socket) {
             payloadData = opts.data,
             opcode;
 
-        if(opts.data instanceof Buffer) {
+        if(!type && opts.data instanceof Buffer) {
             type = 'binary';
             payloadData = new Buffer(payloadData);
         }
@@ -254,7 +258,6 @@ function encodeWsFrame(data) {
             frame.push((payloadLen & (0xFF << (i * 8))) >> (i * 8));
         }
     }
-
     
     frame = payloadData ? Buffer.concat([new Buffer(frame), payloadData]) : new Buffer(frame);
 
