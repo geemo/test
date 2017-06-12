@@ -2,8 +2,8 @@ package worker
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
-	"time"
 	"worker/file"
 )
 
@@ -13,6 +13,7 @@ const workerCount = 2
 
 func TestWorker(t *testing.T) {
 	in, out := make(chan *file.File), make(chan *file.File)
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	go input(in)
 	for i := 0; i < workerCount; i++ {
@@ -28,7 +29,7 @@ func input(in chan *file.File) {
 			files = files[1:]
 			in <- &f
 		}
-		time.Sleep(time.Second)
+		// time.Sleep(time.Second)
 	}
 }
 
