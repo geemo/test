@@ -9,7 +9,9 @@ impl fmt::Display for List {
     try!(write!(f, "["));
 
     for (count, v) in vec.iter().enumerate() {
-      if count != 0 { try!(write!(f, ", ")); }
+      if count != 0 {
+        try!(write!(f, ", "));
+      }
       try!(write!(f, "{}: {}", count, v));
     }
 
